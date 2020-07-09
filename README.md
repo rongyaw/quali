@@ -14,7 +14,7 @@ This project is designed for qualiying competition of F1tenth 2020 Competition.
 - os
 
 **Operation steps**
-1. Clone this repo into the /f1tenth_gym_ros directory and rebuild the package
-2. When in phase 1a of qualifying mode(2 lap rush), use planner_fast.launch file to achieve short lap-time.
+1. Clone this repo into the /f1tenth_gym_ros directory and rebuild the package.
+2. When in phase 1a of qualifying mode(2 lap rush), use planner_fast.launch file.
 3. When in pahse 2a of qualifying mode(obstacle avoidance), use planner_slow.launch file. 
-3. ctrl-c to planner.launch to stop the navigation
+4. ctrl-c to planner.launch to stop the navigation.
