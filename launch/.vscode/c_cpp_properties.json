@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/tonyyaoyao/f1tenth_ws/devel/include/**",
+                "/home/tonyyaoyao/mushr_ws/devel/include/**",
+                "/opt/ros/melodic/include/**",
+                "/home/tonyyaoyao/mushr_ws/src/mushr/mushr_base/mushr_base/ackermann_cmd_mux/include/**",
+                "/home/tonyyaoyao/mushr_ws/src/mushr/mushr_hardware/realsense/realsense2_camera/include/**",
+                "/home/tonyyaoyao/mushr_ws/src/mushr/mushr_base/vesc/vesc_ackermann/include/**",
+                "/home/tonyyaoyao/mushr_ws/src/mushr/mushr_base/vesc/vesc_driver/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}

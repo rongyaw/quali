@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/rongyaw/f1tenth_ws/devel/include/**",
+                "/home/rongyaw/f110_ws/devel/include/**",
+                "/opt/ros/melodic/include/**",
+                "/home/rongyaw/f110_ws/src/f110-fall2018-skeletons/system/racecar/ackermann_cmd_mux/include/**",
+                "/home/rongyaw/f110_ws/src/f110-fall2018-skeletons/system/hokuyo_node/include/**",
+                "/home/rongyaw/f110_ws/src/f110-fall2018-skeletons/system/serial/include/**",
+                "/home/rongyaw/f110_ws/src/f110-fall2018-skeletons/system/vesc/vesc_ackermann/include/**",
+                "/home/rongyaw/f110_ws/src/f110-fall2018-skeletons/system/vesc/vesc_driver/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}
