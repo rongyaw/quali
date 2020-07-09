@@ -27,7 +27,7 @@ class following_path:
         self.MAX_VELOCITY = 7.0
         self.MIN_VELOCITY = 1.5
         self.max_angle = 0.42
-        self.LOOKAHEAD_DISTANCE = 0.25
+        self.LOOKAHEAD_DISTANCE = 0.2
         self.Low_Speed_Mode = False
     
     def scan_callback(self, scan_msg):
@@ -168,11 +168,11 @@ class following_path:
             k = (self.MAX_VELOCITY - self.MIN_VELOCITY)/self.max_angle
             Velocity = -k*abs(angle) + self.MAX_VELOCITY
         return Velocity
-
+        print('Look ahead distance is ' + str(self.LOOKAHEAD_DISTANCE) + ' m with speed of ' + str(Velocity) + ' m/s.')
+        
     def lookahead_distance_control(self):
-        self.LOOKAHEAD_DISTANCE = 0.6 - 0.35*math.atan(self.yaw_sum**2)/(math.pi/2)
-        print('Look ahead distance is ' + str(self.LOOKAHEAD_DISTANCE))# + ' with yaw sum of ' + str(self.yaw_sum))
-
+        self.LOOKAHEAD_DISTANCE = 0.7 - 0.5*math.atan(self.yaw_sum**2)/(math.pi/2)
+        
 if __name__ == "__main__":
     rospy.init_node("pursuit_path")
     following_path()
