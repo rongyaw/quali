@@ -24,10 +24,10 @@ class following_path:
         self.path_info = []
         self.Goal = []
         self.navigation_input = rospy.Publisher('/drive', AckermannDriveStamped, queue_size=1)
-        self.MAX_VELOCITY = 6.75
+        self.MAX_VELOCITY = 7.0
         self.MIN_VELOCITY = 2.5
-        self.max_angle = 0.42
-        self.LOOKAHEAD_DISTANCE = 1.25
+        self.max_angle = 0.4
+        self.LOOKAHEAD_DISTANCE = 1.2
         self.Low_Speed_Mode = False
     
     def scan_callback(self, scan_msg):
@@ -162,7 +162,7 @@ class following_path:
     def speed_control(self, angle):
         # Assume the speed change linearly with respect to yaw angle
         if self.Low_Speed_Mode:
-            Velocity = 2.5
+            Velocity = 2.0
             print('Low Speed on.')
         else:
             k = (self.MAX_VELOCITY - self.MIN_VELOCITY)/self.max_angle
@@ -171,7 +171,7 @@ class following_path:
         print('Look ahead distance is ' + str(self.LOOKAHEAD_DISTANCE) + ' m with speed of ' + str(Velocity) + ' m/s.')
         
     def lookahead_distance_control(self):
-        self.LOOKAHEAD_DISTANCE = 1.2 - 0.85*math.atan(self.yaw_sum**2)/(math.pi/2)
+        self.LOOKAHEAD_DISTANCE = 1.5 - 0.75*math.atan(self.yaw_sum**2)/(math.pi/2)
         
 if __name__ == "__main__":
     rospy.init_node("pursuit_path")
