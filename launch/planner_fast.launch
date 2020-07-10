@@ -33,7 +33,7 @@
 	</node>
 	
 	<!--Create path generation node to find available goal point-->
-	<node pkg="f1tenth_gym_ros" type="path_generation.py" name="path_generation"/>
+	<node pkg="f1tenth_gym_ros" type="path_generation_fast.py" name="path_generation"/>
 
 	<!--Create pure pursuit node to track path-->
 	<node pkg="f1tenth_gym_ros" type="path_pursuit_fast.py" name="pursuit_path" output="screen"/>

@@ -105,7 +105,7 @@ class path_generation():
             if np.linalg.norm(self.amcl_pose - robot_pose) > 0.1:
                 robot_pose = self.amcl_pose
         
-        local_goal = self.find_local_goal(robot_pose, ahead_distance=2.5)
+        local_goal = self.find_local_goal(robot_pose, ahead_distance=1.85)
         goal_x = self.racing_line[0][local_goal]
         goal_y = self.racing_line[1][local_goal]
         goal_yaw = self.racing_line[2][local_goal]
@@ -133,7 +133,7 @@ class path_generation():
             self.temp_goal = [goal_x, goal_y, goal_yaw]
 
         # Publish local goal to move_base_simple/goal to give information to local planner.
-        if ((self.temp_goal[0] - robot_pose[0])**2 + (self.temp_goal[1] - robot_pose[1])**2)**0.5 < 1.5:
+        if ((self.temp_goal[0] - robot_pose[0])**2 + (self.temp_goal[1] - robot_pose[1])**2)**0.5 < 2.0:
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = self.frame_id
             goal_pose.pose.position.x = goal_x
@@ -209,7 +209,7 @@ class path_generation():
 if __name__ == '__main__':
     rospy.init_node('path_generation')
     dirname = os.path.dirname(__file__)
-    filename = os.path.join(dirname,'berlin.csv')
+    filename = os.path.join(dirname,'berlin_fast.csv')
     path_points = draw_racing_line(filename)
     path_generation(path_points)
     rospy.spin()
