@@ -105,7 +105,7 @@ class path_generation():
             if np.linalg.norm(self.amcl_pose - robot_pose) > 0.1:
                 robot_pose = self.amcl_pose
         
-        local_goal = self.find_local_goal(robot_pose, ahead_distance=2.0)
+        local_goal = self.find_local_goal(robot_pose, ahead_distance=2.5)
         goal_x = self.racing_line[0][local_goal]
         goal_y = self.racing_line[1][local_goal]
         goal_yaw = self.racing_line[2][local_goal]
