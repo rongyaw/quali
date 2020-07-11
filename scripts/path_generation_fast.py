@@ -65,6 +65,7 @@ class path_generation():
         self.temp_goal = []
         self.odom_pose = []
         self.amcl_pose = []
+        self.local_goal = 0
         self.racing_line = racing_line
         self.frame_id = 'map'
         self.map_resolution = [];
@@ -105,18 +106,22 @@ class path_generation():
             if np.linalg.norm(self.amcl_pose - robot_pose) > 0.1:
                 robot_pose = self.amcl_pose
         
-        local_goal = self.find_local_goal(robot_pose, ahead_distance=1.75)
-        goal_x = self.racing_line[0][local_goal]
-        goal_y = self.racing_line[1][local_goal]
-        goal_yaw = self.racing_line[2][local_goal]
+        local_goal = self.find_local_goal(robot_pose, ahead_distance=2.25)
+        
+        if not local_goal == []:
+            self.local_goal = local_goal
+
+        goal_x = self.racing_line[0][self.local_goal]
+        goal_y = self.racing_line[1][self.local_goal]
+        goal_yaw = self.racing_line[2][self.local_goal]
         cell_info = self.obstacle_check(goal_x, goal_y, goal_yaw)
         print(cell_info)
 
         while cell_info > 5:
-            local_goal = local_goal + 5
-            goal_x = self.racing_line[0][local_goal]
-            goal_y = self.racing_line[1][local_goal]
-            goal_yaw = self.racing_line[2][local_goal]
+            self.local_goal = self.local_goal + 5
+            goal_x = self.racing_line[0][self.local_goal]
+            goal_y = self.racing_line[1][self.local_goal]
+            goal_yaw = self.racing_line[2][self.local_goal]
             cell_info = self.obstacle_check(goal_x, goal_y, goal_yaw)
         path_quaternion = quaternion_from_euler(0.0, 0.0, goal_yaw)
         
@@ -133,7 +138,7 @@ class path_generation():
             self.temp_goal = [goal_x, goal_y, goal_yaw]
 
         # Publish local goal to move_base_simple/goal to give information to local planner.
-        if ((self.temp_goal[0] - robot_pose[0])**2 + (self.temp_goal[1] - robot_pose[1])**2)**0.5 < 2.0:
+        if ((self.temp_goal[0] - robot_pose[0])**2 + (self.temp_goal[1] - robot_pose[1])**2)**0.5 < 1.25:
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = self.frame_id
             goal_pose.pose.position.x = goal_x
@@ -161,7 +166,7 @@ class path_generation():
         self.amcl_pose = np.array([amcl_x, amcl_y, yaw])
 
 
-    def find_local_goal(self, current_pose, ahead_distance = 3.5):
+    def find_local_goal(self, current_pose, ahead_distance = 2.5):
         path_pose_x = self.racing_line[0]
         path_pose_y = self.racing_line[1]
         
@@ -180,9 +185,12 @@ class path_generation():
             angle_array[i] = angle
         
         # Choose local goal from angle_array
-        goal_id = np.argmin(angle_array)
-        goal = goal_array[goal_id]
-        return goal
+        if len(angle_array) == 0:
+            return []
+        else:
+            goal_id = np.argmin(angle_array)
+            goal = goal_array[goal_id]
+            return goal
     
     def obstacle_check(self, goal_x, goal_y, goal_yaw):
         # Collision check of goal location

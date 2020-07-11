@@ -20,14 +20,14 @@ class following_path:
         self.Pose = []
         self.yaw_sum = 0
         self.amcl_pose = []
-        self.path_pose = rospy.Subscriber('/move_base/GlobalPlanner/plan', Path, self.callback_read_path, queue_size=2)
+        self.path_pose = rospy.Subscriber('/move_base/TrajectoryPlannerROS/global_plan', Path, self.callback_read_path, queue_size=2)
         self.path_info = []
         self.Goal = []
         self.navigation_input = rospy.Publisher('/drive', AckermannDriveStamped, queue_size=1)
-        self.MAX_VELOCITY = 8.5
-        self.MIN_VELOCITY = 2.5
-        self.max_angle = 0.42
-        self.LOOKAHEAD_DISTANCE = 1.5
+        self.MAX_VELOCITY = 8.3
+        self.MIN_VELOCITY = 2.2
+        self.max_angle = 0.34
+        self.LOOKAHEAD_DISTANCE = 1.35
         self.Low_Speed_Mode = False
     
     def scan_callback(self, scan_msg):
@@ -165,13 +165,13 @@ class following_path:
             Velocity = 2.5
             print('Low Speed on.')
         else:
-            k = (self.MAX_VELOCITY - self.MIN_VELOCITY - 1.25)/self.max_angle
-            Velocity = -k*abs(angle) + self.MAX_VELOCITY
+            k = (self.MIN_VELOCITY + 1.2 - self.MAX_VELOCITY)/self.max_angle
+            Velocity = k*abs(angle) + self.MAX_VELOCITY
         return Velocity
         print('Look ahead distance is ' + str(self.LOOKAHEAD_DISTANCE) + ' m with speed of ' + str(Velocity) + ' m/s.')
         
     def lookahead_distance_control(self):
-        self.LOOKAHEAD_DISTANCE = 1.5 - 0.85*math.atan(self.yaw_sum)/(math.pi/2)
+        self.LOOKAHEAD_DISTANCE = 1.35 - 0.65*math.atan(self.yaw_sum)/(math.pi/2)
         
 if __name__ == "__main__":
     rospy.init_node("pursuit_path")
