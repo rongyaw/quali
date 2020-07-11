@@ -108,8 +108,8 @@ def main():
 
     global max_velocity
     global max_steering_angle
-    max_velocity = rospy.get_param("~speed", 1.5)
-    max_steering_angle = rospy.get_param("~max_steering_angle", 0.4)
+    max_velocity = rospy.get_param("~speed", 1.0)
+    max_steering_angle = rospy.get_param("~max_steering_angle", 0.40)
 
     state_pub = rospy.Publisher(
         "/drive", AckermannDriveStamped, queue_size=1

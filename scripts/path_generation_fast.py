@@ -105,7 +105,7 @@ class path_generation():
             if np.linalg.norm(self.amcl_pose - robot_pose) > 0.1:
                 robot_pose = self.amcl_pose
         
-        local_goal = self.find_local_goal(robot_pose, ahead_distance=1.85)
+        local_goal = self.find_local_goal(robot_pose, ahead_distance=1.75)
         goal_x = self.racing_line[0][local_goal]
         goal_y = self.racing_line[1][local_goal]
         goal_yaw = self.racing_line[2][local_goal]
@@ -161,7 +161,7 @@ class path_generation():
         self.amcl_pose = np.array([amcl_x, amcl_y, yaw])
 
 
-    def find_local_goal(self, current_pose, ahead_distance = 2.0):
+    def find_local_goal(self, current_pose, ahead_distance = 3.5):
         path_pose_x = self.racing_line[0]
         path_pose_y = self.racing_line[1]
         
@@ -169,7 +169,7 @@ class path_generation():
         dist_array = np.zeros(len(path_pose_x))
         for i in range(len(path_pose_x)):
             dist_array[i] = ((path_pose_x[i] - current_pose[0])**2 + (path_pose_y[i] - current_pose[1])**2)**0.5
-        goal_array = np.where((dist_array < (ahead_distance + 0.15)) & (dist_array > (ahead_distance - 0.15)))[0]
+        goal_array = np.where((dist_array < (ahead_distance + 0.4)) & (dist_array > (ahead_distance - 0.2)))[0]
         
         # Compute the angle between candidate pose and current pose
         angle_array = np.zeros(len(goal_array))
@@ -178,6 +178,7 @@ class path_generation():
             v2 = [math.cos(current_pose[2]), math.sin(current_pose[2])]
             angle = self.find_angle(v1,v2)
             angle_array[i] = angle
+        
         # Choose local goal from angle_array
         goal_id = np.argmin(angle_array)
         goal = goal_array[goal_id]
@@ -209,7 +210,7 @@ class path_generation():
 if __name__ == '__main__':
     rospy.init_node('path_generation')
     dirname = os.path.dirname(__file__)
-    filename = os.path.join(dirname,'berlin_fast.csv')
+    filename = os.path.join(dirname,'berlin_fast_2.csv')
     path_points = draw_racing_line(filename)
     path_generation(path_points)
     rospy.spin()
