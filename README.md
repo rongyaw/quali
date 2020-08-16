@@ -14,7 +14,7 @@ This project is designed for qualiying competition of F1tenth 2020 Competition.
 
 **Operation steps**
 1. Clone this repo into the /f1tenth_gym_ros directory and rebuild the package.
-2. When in phase 1a of qualifying mode(2 lap rush), use planner_fast.launch file.
+2. Use planner_fast.launch file to start running.
 ```bash
 $ roslaunch f1tenth_gym_ros planner_fast.launch
 ```
