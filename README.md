@@ -5,7 +5,6 @@ This project is designed for qualiying competition of F1tenth 2020 Competition.
 # Installation
 **ROS package requirements:**
 - ros-melodic-move-base
-- ros-melodic-amcl
 - ros-melodic-teb-local-planner
 
 **Python package requirements:**
@@ -19,8 +18,4 @@ This project is designed for qualiying competition of F1tenth 2020 Competition.
 ```bash
 $ roslaunch f1tenth_gym_ros planner_fast.launch
 ```
-3. When in pahse 2a of qualifying mode(obstacle avoidance), use planner.launch file. 
-```bash
-$ roslaunch f1tenth_gym_ros planner.launch
-```
-4. ctrl-c to planner.launch to stop the navigation.
+3. ctrl-c to planner.launch to stop the navigation.
