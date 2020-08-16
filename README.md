@@ -18,4 +18,4 @@ This project is designed for qualiying competition of F1tenth 2020 Competition.
 ```bash
 $ roslaunch f1tenth_gym_ros planner_fast.launch
 ```
-3. ctrl-c to planner.launch to stop the navigation.
+3. ctrl-c to planner_fast.launch to stop the navigation.
