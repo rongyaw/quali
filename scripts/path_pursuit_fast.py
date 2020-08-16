@@ -15,18 +15,16 @@ import os
 class following_path:
     def __init__(self):
         self.current_pose = rospy.Subscriber('/odom', Odometry, self.callback_read_current_position, queue_size=2)
-        self.odometry_subscriber = rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.callback_read_amcl_position, queue_size = 1)
         self.scan_sub = rospy.Subscriber('/scan', LaserScan, self.scan_callback, queue_size=1)
         self.Pose = []
-        self.yaw_sum = 0
-        self.amcl_pose = []
-        self.path_pose = rospy.Subscriber('/move_base/TrajectoryPlannerROS/global_plan', Path, self.callback_read_path, queue_size=2)
+        self.yaw_max = []
+        self.path_pose = rospy.Subscriber('/move_base/GlobalPlanner/plan', Path, self.callback_read_path, queue_size=2)
         self.path_info = []
         self.Goal = []
         self.navigation_input = rospy.Publisher('/drive', AckermannDriveStamped, queue_size=1)
         self.MAX_VELOCITY = 8.3
         self.MIN_VELOCITY = 2.2
-        self.max_angle = 0.34
+        self.max_angle = 0.4189
         self.LOOKAHEAD_DISTANCE = 1.35
         self.Low_Speed_Mode = False
     
@@ -41,7 +39,7 @@ class following_path:
         # Organize the pose message and only ask for (x,y) and orientation
         # Read the Real time pose message and load them into path_info
         self.path_info = []
-        self.yaw_sum = 0
+        self.yaw_max = 0
         yaw_data = []
         path_array = data.poses
         for path_pose in path_array:
@@ -58,8 +56,8 @@ class following_path:
             self.path_info.append([float(path_x), float(path_y), float(path_yaw)])
         self.Goal = list(self.path_info[-1]) # Set the last pose of the global path as goal location
         yaw_data = np.array(yaw_data)
-        for i in range(len(yaw_data)-1):
-            self.yaw_sum = self.yaw_sum + abs(yaw_data[i+1] - yaw_data[i])
+        delta_yaw = abs(yaw_data - self.Pose[2])
+        self.yaw_max = max(delta_yaw)
 
     def callback_read_current_position(self, data):
         if not len(self.path_info) == 0:
@@ -81,9 +79,6 @@ class following_path:
             euler = euler_from_quaternion(quaternion)
             yaw = euler[2]
             self.Pose = np.array([float(x), float(y), float(yaw)])
-
-            if np.linalg.norm(self.amcl_pose - self.Pose) > 0.02:
-                self.Pose = self.amcl_pose
 
             # 2. Find the path point closest to the vehichle tat is >= 1 lookahead distance from vehicle's current location.
             dist_array = np.zeros(len(path_points_x))
@@ -124,8 +119,8 @@ class following_path:
             # Write the Velocity and angle data into the ackermann message
             ackermann_control = AckermannDriveStamped()
             ackermann_control.drive.speed = VELOCITY
-            ackermann_control.drive.acceleration = 9.51
-            ackermann_control.drive.steering_angle_velocity = 3.2
+            #ackermann_control.drive.acceleration = 9.51
+            #ackermann_control.drive.steering_angle_velocity = 3.2
             ackermann_control.drive.steering_angle = angle
         else:
             ackermann_control = AckermannDriveStamped()
@@ -135,18 +130,6 @@ class following_path:
             ackermann_control.drive.steering_angle_velocity = 0.0
         
         self.navigation_input.publish(ackermann_control)
-    
-    def callback_read_amcl_position(self, data):
-        amcl_x = data.pose.pose.position.x
-        amcl_y = data.pose.pose.position.y
-        amcl_ori_x = data.pose.pose.orientation.x
-        amcl_ori_y = data.pose.pose.orientation.y
-        amcl_ori_z = data.pose.pose.orientation.z
-        amcl_ori_w = data.pose.pose.orientation.w
-        quaternion = (amcl_ori_x, amcl_ori_y, amcl_ori_z, amcl_ori_w)
-        euler = euler_from_quaternion(quaternion)
-        yaw = euler[2]
-        self.amcl_pose = np.array([amcl_x, amcl_y, yaw])
 
     # Computes the Euclidean distance between two 2D points p1 and p2
     def dist(self, p1, p2):
@@ -162,16 +145,18 @@ class following_path:
     def speed_control(self, angle):
         # Assume the speed change linearly with respect to yaw angle
         if self.Low_Speed_Mode:
-            Velocity = 2.5
+            Velocity = 8.0
             print('Low Speed on.')
         else:
-            k = (self.MIN_VELOCITY + 1.2 - self.MAX_VELOCITY)/self.max_angle
+            k = (self.MIN_VELOCITY - self.MAX_VELOCITY)/self.max_angle
             Velocity = k*abs(angle) + self.MAX_VELOCITY
         return Velocity
-        print('Look ahead distance is ' + str(self.LOOKAHEAD_DISTANCE) + ' m with speed of ' + str(Velocity) + ' m/s.')
         
     def lookahead_distance_control(self):
-        self.LOOKAHEAD_DISTANCE = 1.35 - 0.65*math.atan(self.yaw_sum)/(math.pi/2)
+        self.LOOKAHEAD_DISTANCE = 1.3 - 0.3*math.atan(self.yaw_max/0.4189)/(math.pi/2)
+        self.MAX_VELOCITY = 12.5 - 6.7*math.atan(self.yaw_max/0.4189)/(math.pi/2)
+        self.MIN_VELOCITY = 6.0 - 2.5*math.atan(self.yaw_max/0.4189)/(math.pi/2)
+        print('Maximum speed is ' + str(self.MAX_VELOCITY) + ' m/s and Minimum speed is ' + str(self.MIN_VELOCITY) + ' m/s.')
         
 if __name__ == "__main__":
     rospy.init_node("pursuit_path")

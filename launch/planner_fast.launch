@@ -9,28 +9,14 @@
     <!--rosparam file="$(find f1tenth_gym_ros)/quali/config/teb_local_planner_params.yaml" command="load" /-->
 
     <param name="base_global_planner" value="global_planner/GlobalPlanner" />
-    <param name="planner_frequency" value="1" />
+    <param name="planner_frequency" value="20.0" />
     <param name="planner_patience" value="10.0" />
 	<!--param name="cost_factor" value="0.6" /-->
 	<param name="neutral_cost" value="75" />
     <!--param name="use_dijkstra" value="false" /-->
-    
-    <!--param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-    <param name="controller_frequency" value="15.0" />
-    <param name="controller_patience" value="30.0" /-->
 
     <param name="clearing_rotation_allowed" value="false" />
     </node>
-	
-	<!--Create amcl particle filter to further localize robot state-->
-	<node pkg="amcl" type="amcl" name="amcl" output="screen">
-		<rosparam file="$(find f1tenth_gym_ros)/quali/config/amcl_params.yaml" command="load" />
-	    <param name="initial_pose_x"            value="0"/>
-		<param name="initial_pose_y"            value="0"/>
-		<param name="initial_pose_a"            value="0"/>
-		<param name="update_min_d"				value="0.075"/>
-		<param name="update_min_a"				value="0.1"/>
-	</node>
 	
 	<!--Create path generation node to find available goal point-->
 	<node pkg="f1tenth_gym_ros" type="path_generation_fast.py" name="path_generation"/>

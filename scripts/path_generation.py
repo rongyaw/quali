@@ -56,15 +56,15 @@ def draw_racing_line(filename):
 class path_generation():
     def __init__(self, racing_line):
         self.odometry_subscriber = rospy.Subscriber('/odom', Odometry, self.callback_read_position, queue_size = 1)
-        self.odometry_subscriber = rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.callback_read_amcl_position, queue_size = 1)
+        #self.odometry_subscriber = rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.callback_read_amcl_position, queue_size = 1)
         self.costmap_subscriber = rospy.Subscriber('/move_base/global_costmap/costmap', OccupancyGrid, self.callback_map_info, queue_size = 1)
         self.goal_publisher = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size = 1)
         self.path_pose = rospy.Subscriber('/move_base/GlobalPlanner/plan', Path, self.callback_read_path, queue_size=3)
         self.costmap_info = []
-        self.path_info = []
         self.temp_goal = []
         self.odom_pose = []
-        self.amcl_pose = []
+        self.goal_id = []
+        #self.amcl_pose = []
         self.racing_line = racing_line
         self.frame_id = 'map'
         self.map_resolution = [];
@@ -100,12 +100,13 @@ class path_generation():
         euler = euler_from_quaternion(quaternion)
         yaw = euler[2]
         robot_pose = np.array([x,y,yaw])
-
+        '''
         if not (len(self.amcl_pose) == 0):
             if np.linalg.norm(self.amcl_pose - robot_pose) > 0.1:
                 robot_pose = self.amcl_pose
-        
-        local_goal = self.find_local_goal(robot_pose, ahead_distance=2.5)
+        '''
+        local_goal = self.find_local_goal(robot_pose, ahead_distance=5.0)
+        self.goal_id = local_goal
         goal_x = self.racing_line[0][local_goal]
         goal_y = self.racing_line[1][local_goal]
         goal_yaw = self.racing_line[2][local_goal]
@@ -133,7 +134,7 @@ class path_generation():
             self.temp_goal = [goal_x, goal_y, goal_yaw]
 
         # Publish local goal to move_base_simple/goal to give information to local planner.
-        if ((self.temp_goal[0] - robot_pose[0])**2 + (self.temp_goal[1] - robot_pose[1])**2)**0.5 < 1.5:
+        if ((self.temp_goal[0] - robot_pose[0])**2 + (self.temp_goal[1] - robot_pose[1])**2)**0.5 < 4.5:
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = self.frame_id
             goal_pose.pose.position.x = goal_x
@@ -147,7 +148,7 @@ class path_generation():
             self.temp_goal = [goal_x, goal_y, goal_yaw]
 
         #print('x: ' + str(self.temp_goal[0]) + ' y: ' + str(self.temp_goal[1]) + ' yaw: ' +  str(self.temp_goal[2]))
-
+    '''
     def callback_read_amcl_position(self, data):
         amcl_x = data.pose.pose.position.x
         amcl_y = data.pose.pose.position.y
@@ -159,12 +160,12 @@ class path_generation():
         euler = euler_from_quaternion(quaternion)
         yaw = euler[2]
         self.amcl_pose = np.array([amcl_x, amcl_y, yaw])
-
+    '''
 
     def find_local_goal(self, current_pose, ahead_distance = 2.0):
         path_pose_x = self.racing_line[0]
         path_pose_y = self.racing_line[1]
-        
+
         # Compute the distance between current_pose and path point within a certain distance.
         dist_array = np.zeros(len(path_pose_x))
         for i in range(len(path_pose_x)):
@@ -178,6 +179,7 @@ class path_generation():
             v2 = [math.cos(current_pose[2]), math.sin(current_pose[2])]
             angle = self.find_angle(v1,v2)
             angle_array[i] = angle
+        
         # Choose local goal from angle_array
         goal_id = np.argmin(angle_array)
         goal = goal_array[goal_id]
@@ -209,7 +211,7 @@ class path_generation():
 if __name__ == '__main__':
     rospy.init_node('path_generation')
     dirname = os.path.dirname(__file__)
-    filename = os.path.join(dirname,'berlin.csv')
+    filename = os.path.join(dirname,'berlin_fast_2.csv')
     path_points = draw_racing_line(filename)
     path_generation(path_points)
     rospy.spin()
