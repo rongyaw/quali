@@ -65,6 +65,10 @@ class following_path:
             path_points_x = [float(point[0]) for point in self.path_info]
             path_points_y = [float(point[1]) for point in self.path_info]
             path_points_w = [float(point[2]) for point in self.path_info]
+            
+            # Store the when recevied from odom data (corresponding to state)
+            odom_secs = data.header.stamp.secs
+            odom_nescs = data.header.stamp.nsecs
 
             # Read the current pose of the car from particle filter
             x = data.pose.pose.position.x
@@ -73,7 +77,8 @@ class following_path:
             qy = data.pose.pose.orientation.y
             qz = data.pose.pose.orientation.z
             qw = data.pose.pose.orientation.w
-
+            linear_V = data.twist.twist.linear.x
+            yaw_rate = data.twist.twist.angular.z
             # Convert the quaternion angle to eular angle
             quaternion = (qx,qy,qz,qw)
             euler = euler_from_quaternion(quaternion)
@@ -102,10 +107,6 @@ class following_path:
             glob_y = path_points_y[goal] - y
             goal_x_veh_coord = glob_x*np.cos(yaw) + glob_y*np.sin(yaw)
             goal_y_veh_coord = glob_y*np.cos(yaw) - glob_x*np.sin(yaw)
-
-            # 4. Calculate the curvature = 1/r = 2x/l^2
-            # The curvature is transformed into steering wheel angle by the vehicle on board controller.
-            # Hint: You may need to flip to negative because for the VESC a right steering angle has a negative value.
             
             diff_angle = path_points_w[goal] - yaw # Find the turning angle
             r = L/(2*math.sin(diff_angle)) # Calculate the turning radius
@@ -115,21 +116,26 @@ class following_path:
             #angle = (0 if abs(angle) < 0.05 else angle)
             VELOCITY = self.speed_control(angle)
             self.lookahead_distance_control()
+            
+            if np.random.uniform(0,1) > 1.1:
+                vel_noise = np.random.normal(0, 4)
+                steer_noise = np.random.normal(0, 0.3)
+            else:
+                vel_noise = 0.0
+                steer_noise = 0.0
 
             # Write the Velocity and angle data into the ackermann message
             ackermann_control = AckermannDriveStamped()
-            ackermann_control.drive.speed = VELOCITY
-            #ackermann_control.drive.acceleration = 9.51
-            #ackermann_control.drive.steering_angle_velocity = 3.2
-            ackermann_control.drive.steering_angle = angle
-        else:
-            ackermann_control = AckermannDriveStamped()
-            ackermann_control.drive.speed = 0.0
-            ackermann_control.drive.acceleration = 0.0
-            ackermann_control.drive.steering_angle = 0.0
-            ackermann_control.drive.steering_angle_velocity = 0.0
-        
-        self.navigation_input.publish(ackermann_control)
+            ackermann_control.header.stamp.secs = odom_secs
+            ackermann_control.header.stamp.nsecs = odom_nescs
+            ackermann_control.drive.speed = VELOCITY + vel_noise
+            ackermann_control.drive.steering_angle = angle + steer_noise
+            
+            with open('/home/rongyaw/f1tenth_ws/src/f1tenth_gym_ros/quali/scripts/koopman_berlin_3.txt', 'a') as f:
+                f.write(str(x)[0:6] + '\t' + str(y)[0:6] + '\t' + str(yaw)[0:6] + '\t' + str(linear_V)[0:6] + '\t' + str(yaw_rate)[0:6] + '\t' + str(VELOCITY)[0:6] + '\t' + str(angle)[0:6] + '\t' + str(odom_secs) + '.' + str(odom_nescs)[0:4] + '\n')
+            
+            self.navigation_input.publish(ackermann_control)
+            #print('Velocity noise is ' + str(vel_noise) + ' m/s' + 'Steering noise is ' + str(steer_noise) + ' rad.')
 
     # Computes the Euclidean distance between two 2D points p1 and p2
     def dist(self, p1, p2):
@@ -153,10 +159,10 @@ class following_path:
         return Velocity
         
     def lookahead_distance_control(self):
-        self.LOOKAHEAD_DISTANCE = 1.3 - 0.3*math.atan(self.yaw_max/0.4189)/(math.pi/2)
-        self.MAX_VELOCITY = 12.5 - 6.7*math.atan(self.yaw_max/0.4189)/(math.pi/2)
-        self.MIN_VELOCITY = 6.0 - 2.5*math.atan(self.yaw_max/0.4189)/(math.pi/2)
-        print('Maximum speed is ' + str(self.MAX_VELOCITY) + ' m/s and Minimum speed is ' + str(self.MIN_VELOCITY) + ' m/s.')
+        self.LOOKAHEAD_DISTANCE = 1.3 - 0.3*math.atan(self.yaw_max/0.35)/(math.pi/2)
+        self.MAX_VELOCITY = 12.0 - 6.5*math.atan(self.yaw_max/0.35)/(math.pi/2)
+        self.MIN_VELOCITY = 6.0 - 3.0*math.atan(self.yaw_max/0.35)/(math.pi/2)
+        #print('Look ahead distance is ' + str(self.LOOKAHEAD_DISTANCE) + ' m.')
         
 if __name__ == "__main__":
     rospy.init_node("pursuit_path")

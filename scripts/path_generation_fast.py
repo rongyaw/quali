@@ -132,7 +132,7 @@ class path_generation():
             self.temp_goal = [goal_x, goal_y, goal_yaw]
 
         # Publish local goal to move_base_simple/goal to give information to local planner.
-        if ((self.temp_goal[0] - robot_pose[0])**2 + (self.temp_goal[1] - robot_pose[1])**2)**0.5 < 3.7:
+        if ((self.temp_goal[0] - robot_pose[0])**2 + (self.temp_goal[1] - robot_pose[1])**2)**0.5 < 3.5:
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = self.frame_id
             goal_pose.pose.position.x = goal_x

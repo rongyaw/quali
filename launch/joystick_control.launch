@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <include file="$(find f1tenth_gym_ros)/launch/gym_bridge_host.launch"/>
+    <node pkg="joy" type="joy_node" name="joy_node"/>
+    <node pkg="f1tenth_gym_ros" type="joystick_control.py" name="joystick_control"/>
+</launch>
