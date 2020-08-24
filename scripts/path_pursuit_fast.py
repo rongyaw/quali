@@ -130,10 +130,10 @@ class following_path:
             ackermann_control.header.stamp.nsecs = odom_nescs
             ackermann_control.drive.speed = VELOCITY + vel_noise
             ackermann_control.drive.steering_angle = angle + steer_noise
-            
+            '''
             with open('/home/rongyaw/f1tenth_ws/src/f1tenth_gym_ros/quali/scripts/koopman_berlin_3.txt', 'a') as f:
                 f.write(str(x)[0:6] + '\t' + str(y)[0:6] + '\t' + str(yaw)[0:6] + '\t' + str(linear_V)[0:6] + '\t' + str(yaw_rate)[0:6] + '\t' + str(VELOCITY)[0:6] + '\t' + str(angle)[0:6] + '\t' + str(odom_secs) + '.' + str(odom_nescs)[0:4] + '\n')
-            
+            '''
             self.navigation_input.publish(ackermann_control)
             #print('Velocity noise is ' + str(vel_noise) + ' m/s' + 'Steering noise is ' + str(steer_noise) + ' rad.')
 
@@ -159,9 +159,9 @@ class following_path:
         return Velocity
         
     def lookahead_distance_control(self):
-        self.LOOKAHEAD_DISTANCE = 1.3 - 0.3*math.atan(self.yaw_max/0.35)/(math.pi/2)
-        self.MAX_VELOCITY = 12.0 - 6.5*math.atan(self.yaw_max/0.35)/(math.pi/2)
-        self.MIN_VELOCITY = 6.0 - 3.0*math.atan(self.yaw_max/0.35)/(math.pi/2)
+        self.LOOKAHEAD_DISTANCE = 1.2 - 0.1*math.atan(self.yaw_max/0.35)/(math.pi/2)
+        self.MAX_VELOCITY = 13.0 - 7.0*math.atan(self.yaw_max/0.35)/(math.pi/2)
+        self.MIN_VELOCITY = 6.0 - 3.5*math.atan(self.yaw_max/0.35)/(math.pi/2)
         #print('Look ahead distance is ' + str(self.LOOKAHEAD_DISTANCE) + ' m.')
         
 if __name__ == "__main__":
