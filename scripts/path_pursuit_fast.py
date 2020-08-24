@@ -130,6 +130,9 @@ class following_path:
             ackermann_control.header.stamp.nsecs = odom_nescs
             ackermann_control.drive.speed = VELOCITY + vel_noise
             ackermann_control.drive.steering_angle = angle + steer_noise
+            #===================================================================
+            # Comment out next two line to record the data into current directory
+            #===================================================================
             '''
             with open('/home/rongyaw/f1tenth_ws/src/f1tenth_gym_ros/quali/scripts/koopman_berlin_3.txt', 'a') as f:
                 f.write(str(x)[0:6] + '\t' + str(y)[0:6] + '\t' + str(yaw)[0:6] + '\t' + str(linear_V)[0:6] + '\t' + str(yaw_rate)[0:6] + '\t' + str(VELOCITY)[0:6] + '\t' + str(angle)[0:6] + '\t' + str(odom_secs) + '.' + str(odom_nescs)[0:4] + '\n')
