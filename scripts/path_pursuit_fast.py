@@ -160,7 +160,7 @@ class following_path:
         
     def lookahead_distance_control(self):
         self.LOOKAHEAD_DISTANCE = 1.2 - 0.1*math.atan(self.yaw_max/0.35)/(math.pi/2)
-        self.MAX_VELOCITY = 13.0 - 7.0*math.atan(self.yaw_max/0.35)/(math.pi/2)
+        self.MAX_VELOCITY = 10.0 - 5.0*math.atan(self.yaw_max/0.35)/(math.pi/2)
         self.MIN_VELOCITY = 6.0 - 3.5*math.atan(self.yaw_max/0.35)/(math.pi/2)
         #print('Look ahead distance is ' + str(self.LOOKAHEAD_DISTANCE) + ' m.')
         
