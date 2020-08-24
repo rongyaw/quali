@@ -18,8 +18,8 @@ This project is designed for qualiying competition of F1tenth 2020 Competition.
 ```bash
 $ roslaunch f1tenth_gym_ros planner_fast.launch
 ```
-3. ctrl-c to planner_fast.launch to stop the navigation.
-4. Use joystick control, launch joystick control file with joystick connected to bluetooth.
+3. Use joystick control, launch joystick control file with joystick connected to bluetooth.
 ```bash
 $ roslaunch f1tenth_gym_ros joystick_control.launch
 ```
+4. ctrl-c to launch file to stop the navigation.
